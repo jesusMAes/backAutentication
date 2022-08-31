@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const User = require('./db/userModel')
 
 dbConnect();
-
+console.log("test")
 
 // body parser configuration
 app.use(bodyParser.json());
