@@ -24,3 +24,5 @@ luego guardamos ese token decodificado en user y lo añadimos a req.user.
 De vuelta en app.js importamos esta función dandole un nombre y en la ruta que queremos proteger ponemos la función como segundo argumento: app.post("ruta", la función, callback)
 
 Como si los token no coinciden en algun momento se romperá el try, pasaría al catch lo que usa response para mandarte a otro sitio y no llegas a acceder a la ruta protegida porque esto te intercepta
+
+Con esto ya estaría lo que es la parte back, pero hay que desplegarla porque el back no funciona como el front y no vale con github pages, hay que usar heroku u otro servicio gratis para hacerlo, el archivo profile que hay en root es porque sirve para configurarlo
