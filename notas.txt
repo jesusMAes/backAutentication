@@ -25,4 +25,6 @@ De vuelta en app.js importamos esta función dandole un nombre y en la ruta que 
 
 Como si los token no coinciden en algun momento se romperá el try, pasaría al catch lo que usa response para mandarte a otro sitio y no llegas a acceder a la ruta protegida porque esto te intercepta
 
-Con esto ya estaría lo que es la parte back, pero hay que desplegarla porque el back no funciona como el front y no vale con github pages, hay que usar heroku u otro servicio gratis para hacerlo, el archivo profile que hay en root es porque sirve para configurarlo
+Con esto ya estaría lo que es la parte back, pero hay que desplegarla porque el back no funciona como el front y no vale con github pages, hay que usar heroku u otro servicio gratis para hacerlo, el archivo profile que hay en root es porque sirve para configurarlo. le dice qué ejecutar, en este caso node index.js que es lo que crea el server y pone app.js a la escucha
+
+Para acceder a la base de datos es otro lío porque nuestra clave está en el archivo.env y estos como son secretos no se mandan a github, así que hay que ir a los ajustes de heroku y ponerlo allí
