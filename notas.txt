@@ -1,0 +1,26 @@
+-----------------------------THIS IS A DEVLOG FOR MY FUTURE SELF---
+
+Okay, partimos de una base con app.js e index js. En index nos encargamos de crear el servidor mientras que en apps gestionaremos las rutas. Index usa una función para normalizar el puerto y comprobar que es valido y luego llama a app, que está importada y le pone ese puerto en propiedades, tiene una función para si ocurre algun error y luego una variable server igual a httpcreateserver a lo que le pasa app, con esto puede usarlo para gestionar errores y para ponerle el listen, es un poco raro porque con express esto lo haríamos con app listen y el puerto y ya
+
+En app.js tenemos una app de express más tipica que usa los bodyparser para procesar las peticiones, todo lo relativo a la base de datos lo hacemos en archivos distintos y luego los importamos, así la función de conectar la base de datos está en db/dbconnect, y tan solo es una función que usa mongoose connect, lo mismo con el modelo de la base de datos, usermodl que es un schema que se declara aqui y luego lo exportamos
+
+De vuelta en app importamos eso como variables, ejecutamos dbconnect() y en el post request a register (el post que llevará el formulario) usamos el modelo user para crear uno nuevo y guardarlo en una base de datos, como todo esto son funciones asíncronas asusta tanto then y tanto catch pero en realidad solo usamos bscrypt para encriptar la contraseña, cuando acaba de hacerlo la pasamos a un then, si falla tiene su catch abajo, el then crea un nuevo user con el modelo y llama a save, que a su vez tiene su then por si va bien y su cath por si falla
+
+para las contraseñas usamos un modulo hash que encripta la contraseña de una manera que se guarda en la base de datos de una manera distinta y al comparar usa su propia función para hashear la contraseña que metió el usuario y si coincide es la misma, en teoría esto es más seguro porque elabora versiones mas complicadas que la contraseña original y el admin no ve la contraseña del usuario pero yo que sé ya
+
+Jsonwebtoken es un modulo para transmitir información de manera segura, usandolo podemos mantener al usuario iniciado, basicamente cuando inicia sesión lo verificamos y generamos uno de estos, que permanece activo durante un tiempo y gracias a él podemos darle acceso a determinadas paginas como su perfil y tal sin tener que verificar cada vez
+
+-------POST PARA INICIAR SESIÓN------
+Tremendo mareo el asincronismo. Comenzamos con un app.post clasico, que va a login, primero usamos user.findone para comparar el email, si no se encuentra vamos al catch del final, si si entramos al then, dentro de ese then pasamos el user y usamos bcript para comparar la password que va en el request con la del user de la base de datos, si hay error bajamos al catch y decimos que nanay, si no comprobamos si coinciden viendo el valor de password check que nos lo da compare si no coinciden salimos con un mensaje, si sí creamos un token usando jwt sign, esta función recibe tres parametros, el primero es un objeto con el contenido del token, en este caso el id y email del user, el segundo es el nombre del token, y el tercero es un objeto con opciones, en este caso solo tiene expiresin que dice cuanto tiempo dura, creado el token mandamos una respuesta y passamos un mensaje de confirmación, el email y el token
+
+--------PROTEGER ENDPOINTS--------------
+Para proteger endpoints vamos a crear una función que actúa de middleware, está en un archivo aparte. 
+Allí la exportamos y decimos que es async, esto es porque dentro vamos a usar varias veces el await, dentro de la función usamos un bloque trycatch por si peta. Luego creamos una variable token que es igual a algo que se llama autorization que viene el el header del request, esto viene en el header, son dos cadenas siendo la primera el tipo y la segunda la autenticación, por eso usa el split para separlo a array y luego selecciona la autenticación. 
+
+Luego creamos una variable decodedToken y llamamos a jwt.verify que es una función que coge esa autenticación, la desencripta y compara si es igual a la clave que le pusimos en su momento, que era RANDOM TOKEN. 
+
+luego guardamos ese token decodificado en user y lo añadimos a req.user.
+
+De vuelta en app.js importamos esta función dandole un nombre y en la ruta que queremos proteger ponemos la función como segundo argumento: app.post("ruta", la función, callback)
+
+Como si los token no coinciden en algun momento se romperá el try, pasaría al catch lo que usa response para mandarte a otro sitio y no llegas a acceder a la ruta protegida porque esto te intercepta
